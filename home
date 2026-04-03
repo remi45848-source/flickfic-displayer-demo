@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>FlickFic — Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root{
+      --bg:#080809;
+      --accent:#c8a96e;
+      --muted:rgba(255,255,255,0.38);
+      --dim:rgba(255,255,255,0.14);
+      --text:#ece9e2;
+    }
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Cormorant Garamond',Georgia,serif;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    #grain{
+      position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.035;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:200px;
+      animation:g .5s steps(3) infinite;
+    }
+    @keyframes g{0%{background-position:0 0}33%{background-position:60px 40px}66%{background-position:-40px 80px}}
+
+    nav{
+      display:flex;align-items:center;gap:48px;
+      padding:22px 52px;position:relative;z-index:50;
+    }
+    .logo{
+      font-family:'Cormorant Garamond',serif;
+      font-size:22px;font-weight:400;letter-spacing:8px;color:var(--accent);
+      text-transform:uppercase;white-space:nowrap;
+    }
+    .nav-items{display:flex;gap:32px;flex:1;}
+    .ni{
+      font-family:'Space Mono',monospace;
+      font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;
+      color:var(--muted);
+      cursor:pointer;transition:color .2s;padding-bottom:1px;
+    }
+    .ni:hover,.ni.on{color:var(--text);}
+    .ni.on{border-bottom:1px solid var(--accent);}
+    .nav-r{display:flex;align-items:center;gap:22px;margin-left:auto;}
+    .srch{
+      font-size:14px;color:var(--muted);cursor:pointer;transition:color .2s;line-height:1;
+      user-select:none;
+    }
+    .srch:hover{color:var(--text);}
+    .ava{
+      width:28px;height:28px;border-radius:50%;
+      background:rgba(200,169,110,0.18);
+      border:1px solid rgba(200,169,110,0.35);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Space Mono',monospace;font-size:9px;color:var(--accent);
+      cursor:pointer;user-select:none;
+    }
+
+    .stage{position:relative;height:500px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-top:8px;}
+    .stage::before,.stage::after{content:'';position:absolute;top:0;bottom:0;width:220px;z-index:20;pointer-events:none;}
+    .stage::before{left:0;background:linear-gradient(to right,var(--bg) 30%,transparent);}
+    .stage::after{right:0;background:linear-gradient(to left,var(--bg) 30%,transparent);}
+    .c-track{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+
+    .c-item{
+      position:absolute;
+      transition:all .6s cubic-bezier(.4,0,.2,1);
+      cursor:pointer;
+      transform-origin:center center;
+    }
+    .poster{border-radius:3px;overflow:hidden;position:relative;}
+    .poster-art{
+      width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-end;
+      padding:16px 14px;
+    }
+    .poster::after{
+      content:'';
+      position:absolute;inset:0;
+      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 3px);
+      pointer-events:none;
+    }
+    .p-label{
+      font-family:'Space Mono',monospace;font-size:7px;letter-spacing:3px;text-transform:uppercase;margin-bottom:5px;
+      opacity:.5;
+    }
+    .p-title{
+      font-family:'Cormorant Garamond',serif;font-weight:300;letter-spacing:.05em;line-height:1.05;
+    }
+    .c-item.far{width:128px;height:192px;opacity:.2;z-index:1;}
+    .c-item.near{width:170px;height:255px;opacity:.5;z-index:2;}
+    .c-item.ctr{width:236px;height:354px;opacity:1;z-index:5;}
+    .c-item.far .p-title{font-size:14px;}
+    .c-item.near .p-title{font-size:18px;}
+    .c-item.ctr .p-title{font-size:24px;}
+    .c-item.ctr .poster{box-shadow:0 0 0 1px rgba(200,169,110,0.3),0 32px 80px rgba(0,0,0,.75);}
+
+    .c-item.p-n3{transform:translateX(-390px);}
+    .c-item.p-n2{transform:translateX(-248px);}
+    .c-item.p-n1{transform:translateX(-145px);}
+    .c-item.p-0{transform:translateX(0);}
+    .c-item.p-1{transform:translateX(145px);}
+    .c-item.p-2{transform:translateX(248px);}
+    .c-item.p-3{transform:translateX(390px);}
+
+    .ctr-meta{
+      position:absolute;
+      top:calc(100% + 22px);
+      left:50%;
+      transform:translateX(-50%);
+      width:320px;
+      text-align:center;
+      pointer-events:none;
+      opacity:0;
+      transition:opacity .35s .1s;
+    }
+    .c-item.ctr .ctr-meta{opacity:1;pointer-events:auto;}
+    .cm-eye{
+      font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);
+      margin-bottom:6px;
+    }
+    .cm-title{font-size:28px;font-weight:300;letter-spacing:.04em;color:#ece9e2;line-height:1.05;margin-bottom:8px;}
+    .cm-desc{font-size:12.5px;color:var(--muted);line-height:1.8;letter-spacing:.01em;max-width:280px;margin:0 auto 16px;}
+    .cm-actions{display:flex;align-items:center;justify-content:center;gap:10px;}
+    .btn-enter{
+      font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+      padding:9px 22px;background:var(--accent);color:#080809;border:none;cursor:pointer;
+      transition:opacity .2s;border-radius:1px;
+      white-space:nowrap;
+    }
+    .btn-enter:hover{opacity:.82;}
+    .btn-save{
+      font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+      padding:9px 16px;background:transparent;color:var(--muted);
+      border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all .2s;border-radius:1px;
+      white-space:nowrap;
+    }
+    .btn-save:hover{color:#ece9e2;border-color:rgba(255,255,255,0.35);}
+
+    .dots{display:flex;justify-content:center;gap:7px;margin-top:-6px;padding-bottom:4px;}
+    .dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.2);cursor:pointer;transition:all .3s;}
+    .dot.on{width:20px;border-radius:2px;background:var(--accent);}
+
+    .row-section{padding:40px 52px 52px;}
+    .row-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;}
+    .row-label{
+      font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);
+    }
+    .row-all{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1.5px;color:var(--accent);cursor:pointer;}
+
+    .row-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+    .row-scroll::-webkit-scrollbar{display:none;}
+    .rc{flex-shrink:0;width:118px;cursor:pointer;}
+    .rc:hover .rc-poster{transform:translateY(-5px);border-color:rgba(200,169,110,0.4);}
+    .rc-poster{width:118px;height:176px;border-radius:2px;overflow:hidden;border:0.5px solid rgba(255,255,255,0.08);transition:transform .25s,border-color .25s;}
+    .rc-art{width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;}
+    .rc-sub{font-family:'Space Mono',monospace;font-size:6.5px;letter-spacing:2px;text-transform:uppercase;opacity:.4;margin-bottom:4px;}
+    .rc-t{font-size:14px;font-weight:300;letter-spacing:.04em;line-height:1.1;}
+    .rc-info{margin-top:8px;}
+    .rc-name{font-size:12px;color:rgba(255,255,255,0.65);letter-spacing:.02em;line-height:1.3;}
+    .rc-tag{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:1px;color:var(--dim);margin-top:3px;}
+
+    .footer{padding:20px 52px;border-top:0.5px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;}
+    .footer-left{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.12);}
+    .footer-right{font-size:12px;font-style:italic;color:rgba(255,255,255,0.12);letter-spacing:.03em;}
+
+    @media (max-width: 900px){
+      nav{padding:18px 18px;gap:16px;}
+      .stage{height:420px;}
+      .row-section{padding:28px 18px 40px;}
+      .footer{padding:16px 18px;}
+      .ctr-meta{width:260px;}
+      .c-item.p-n2,.c-item.p-n3,.c-item.p-2,.c-item.p-3{transform:none;}
+    }
+  </style>
+</head>
+<body>
+<div id="grain"></div>
+
+<nav>
+  <div class="logo">FlickFic</div>
+  <div class="nav-items">
+    <div class="ni on">Featured</div>
+    <div class="ni" onclick="location.href='flickfic_browse.html'">Browse</div>
+    <div class="ni" onclick="location.href='flickfic_square.html'">Square</div>
+  </div>
+  <div class="nav-r">
+    <div class="srch" title="Search" onclick="location.href='flickfic_search.html'">&#9906;</div>
+    <div class="ava" onclick="location.href='flickfic_user.html'">R</div>
+  </div>
+</nav>
+
+<div class="stage">
+  <div class="c-track" id="track"></div>
+</div>
+<div class="dots" id="dots"></div>
+
+<div class="row-section">
+  <div class="row-head">
+    <span class="row-label">New &amp; Upcoming</span>
+    <span class="row-all" onclick="location.href='flickfic_browse.html'">See all →</span>
+  </div>
+  <div class="row-scroll" id="rowScroll"></div>
+</div>
+
+<div class="footer">
+  <div class="footer-left">DCN Protocol v2.1</div>
+  <div class="footer-right">Text holds what film forgets.</div>
+</div>
+
+<script>
+  const WORKS = [
+    {id:0,eye:'Series · DCN',title:'New World',desc:'A city that rewrites itself every generation. Three people who remember what it used to be — and one question no one dares to ask aloud.',bg:'linear-gradient(155deg,#1c0e08 0%,#080c1c 55%,#0d0810 100%)',tc:'#c8a96e',ep:'4 Episodes'},
+    {id:1,eye:'Standalone · DCN',title:'Meridian',desc:'A cartographer mapping cities not yet built. One night, the map begins to map her back.',bg:'linear-gradient(155deg,#081a10 0%,#100a28 100%)',tc:'#7cafd4',ep:'1 Episode'},
+    {id:2,eye:'Series · DCN',title:'The Quiet Room',desc:'',bg:'linear-gradient(155deg,#140e08 0%,#080c14 100%)',tc:'#9a9690',ep:'Coming Soon'},
+    {id:3,eye:'Short · DCN',title:'Residue',desc:'',bg:'linear-gradient(155deg,#100a14 0%,#0a1410 100%)',tc:'#9c8ab0',ep:'1 Episode'},
+    {id:4,eye:'Series · DCN',title:'Last Light',desc:'',bg:'linear-gradient(155deg,#1a1008 0%,#08101c 100%)',tc:'#a09460',ep:'In Production'},
+  ];
+
+  let cur = 0;
+  const N = WORKS.length;
+
+  function posInfo(offset){
+    if(offset===0) return {cls:'ctr p-0'};
+    if(offset===-1) return {cls:'near p-n1'};
+    if(offset===1)  return {cls:'near p-1'};
+    if(offset===-2) return {cls:'far p-n2'};
+    if(offset===2)  return {cls:'far p-2'};
+    if(offset<=-3)  return {cls:'far p-n3'};
+    return {cls:'far p-3'};
+  }
+
+  function render(){
+    const track = document.getElementById('track');
+    track.innerHTML = '';
+    for(let i=0;i<N;i++){
+      let off = ((i-cur)%N + N) % N;
+      if(off > N/2) off -= N;
+      if(Math.abs(off) > 3) continue;
+      const w = WORKS[i];
+      const {cls} = posInfo(off);
+      const isCtr = off === 0;
+
+      const item = document.createElement('div');
+      item.className = 'c-item ' + cls;
+
+      const poster = document.createElement('div');
+      poster.className = 'poster';
+
+      const art = document.createElement('div');
+      art.className = 'poster-art';
+      art.style.background = w.bg;
+      art.innerHTML =
+        '<div class="p-label">FlickFic</div>' +
+        '<div class="p-title" style="color:'+w.tc+'">'+w.title+'</div>';
+
+      poster.appendChild(art);
+      item.appendChild(poster);
+
+      if(isCtr){
+        const meta = document.createElement('div');
+        meta.className = 'ctr-meta';
+        meta.innerHTML =
+          '<div class="cm-eye">'+w.eye+'</div>' +
+          '<div class="cm-title">'+w.title+'</div>' +
+          '<div class="cm-desc">'+(w.desc || w.ep)+'</div>' +
+          '<div class="cm-actions">' +
+            '<button class="btn-enter" onclick="enter('+w.id+')">Enter</button>' +
+            '<button class="btn-save" id="collectBtn" onclick="toggleCollect(this)">+ Collect</button>' +
+          '</div>';
+        item.appendChild(meta);
+      }else{
+        item.addEventListener('click',()=>goTo(i));
+      }
+      track.appendChild(item);
+    }
+
+    const dotsEl = document.getElementById('dots');
+    dotsEl.innerHTML = '';
+    WORKS.forEach((_,i)=>{
+      const d = document.createElement('div');
+      d.className = 'dot' + (i===cur ? ' on' : '');
+      d.onclick = ()=>goTo(i);
+      dotsEl.appendChild(d);
+    });
+  }
+
+  function goTo(i){
+    cur = i;
+    render();
+  }
+
+  function enter(id){
+    if(id === 0){
+      location.href = 'flickfic_newworld_detail.html';
+      return;
+    }
+    // demo：其他作品暂先也进入 New World 详情（程序员后续可按 workId 路由扩展）
+    location.href = 'flickfic_newworld_detail.html';
+  }
+
+  function toggleCollect(btn){
+    const t = btn.textContent.trim();
+    btn.textContent = t.includes('+') ? '✓ Collected' : '+ Collect';
+  }
+
+  // drag / swipe
+  let sx = 0;
+  const tr = document.getElementById('track');
+  tr.addEventListener('mousedown', (e)=>{ sx = e.clientX; });
+  document.addEventListener('mouseup', (e)=>{
+    const dx = e.clientX - sx;
+    if(Math.abs(dx) > 45){
+      dx < 0 ? goTo((cur+1)%N) : goTo((cur-1+N)%N);
+    }
+  });
+  tr.addEventListener('touchstart', (e)=>{ sx = e.touches[0].clientX; }, {passive:true});
+  tr.addEventListener('touchend', (e)=>{
+    const dx = e.changedTouches[0].clientX - sx;
+    if(Math.abs(dx) > 40){
+      dx < 0 ? goTo((cur+1)%N) : goTo((cur-1+N)%N);
+    }
+  }, {passive:true});
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'ArrowLeft') goTo((cur-1+N)%N);
+    if(e.key === 'ArrowRight') goTo((cur+1)%N);
+  });
+
+  const ROW = [
+    {title:'New World',tag:'EP 01 · Out Now',bg:'linear-gradient(155deg,#1c0e08,#080c1c)',tc:'#c8a96e',id:0},
+    {title:'Meridian',tag:'Standalone',bg:'linear-gradient(155deg,#081a10,#100a28)',tc:'#7cafd4',id:1},
+    {title:'The Quiet Room',tag:'Coming Soon',bg:'linear-gradient(155deg,#140e08,#080c14)',tc:'#9a9690',id:2},
+    {title:'Residue',tag:'Short · Out Now',bg:'linear-gradient(155deg,#100a14,#0a1410)',tc:'#9c8ab0',id:3},
+    {title:'Last Light',tag:'In Production',bg:'linear-gradient(155deg,#1a1008,#08101c)',tc:'#a09460',id:4},
+    {title:'Archive Room',tag:'Coming 2026',bg:'linear-gradient(155deg,#0a1218,#140a10)',tc:'#7aaa98',id:0},
+  ];
+
+  const rs = document.getElementById('rowScroll');
+  ROW.forEach((r)=>{
+    const c = document.createElement('div');
+    c.className = 'rc';
+    c.innerHTML =
+      '<div class="rc-poster">' +
+        '<div class="rc-art" style="background:'+r.bg+'">' +
+          '<div class="rc-sub">FlickFic</div>' +
+          '<div class="rc-t" style="color:'+r.tc+'">'+r.title+'</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="rc-info">' +
+        '<div class="rc-name">'+r.title+'</div>' +
+        '<div class="rc-tag">'+r.tag+'</div>' +
+      '</div>';
+    c.onclick = ()=>enter(r.id);
+    rs.appendChild(c);
+  });
+
+  render();
+</script>
+</body>
+</html>
