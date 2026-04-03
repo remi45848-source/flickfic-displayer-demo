@@ -75,10 +75,26 @@
       cursor:pointer;
       transform-origin:center center;
     }
-    .poster{border-radius:3px;overflow:hidden;position:relative;}
+    .poster{
+      border-radius:2px;
+      overflow:hidden;
+      position:relative;
+      background:#0b0b0f;
+      border:0.5px solid rgba(255,255,255,0.1);
+    }
+    .poster-img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter:saturate(.88) contrast(1.05);
+      transform:scale(1.01);
+    }
     .poster-art{
+      position:absolute;inset:0;
       width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-end;
       padding:16px 14px;
+      background:linear-gradient(to top, rgba(0,0,0,.7) 10%, rgba(0,0,0,.15) 55%, rgba(0,0,0,.02) 100%);
     }
     .poster::after{
       content:'';
@@ -126,6 +142,8 @@
       margin-bottom:6px;
     }
     .cm-title{font-size:28px;font-weight:300;letter-spacing:.04em;color:#ece9e2;line-height:1.05;margin-bottom:8px;}
+    .cm-title.link{cursor:pointer;pointer-events:auto;transition:color .2s;}
+    .cm-title.link:hover{color:var(--accent);}
     .cm-desc{font-size:12.5px;color:var(--muted);line-height:1.8;letter-spacing:.01em;max-width:280px;margin:0 auto 16px;}
     .cm-actions{display:flex;align-items:center;justify-content:center;gap:10px;}
     .btn-enter{
@@ -158,8 +176,9 @@
     .row-scroll::-webkit-scrollbar{display:none;}
     .rc{flex-shrink:0;width:118px;cursor:pointer;}
     .rc:hover .rc-poster{transform:translateY(-5px);border-color:rgba(200,169,110,0.4);}
-    .rc-poster{width:118px;height:176px;border-radius:2px;overflow:hidden;border:0.5px solid rgba(255,255,255,0.08);transition:transform .25s,border-color .25s;}
-    .rc-art{width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;}
+    .rc-poster{width:118px;height:176px;border-radius:2px;overflow:hidden;border:0.5px solid rgba(255,255,255,0.08);transition:transform .25s,border-color .25s;position:relative;background:#0b0b0f;}
+    .rc-img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.86) contrast(1.03);}
+    .rc-art{position:absolute;inset:0;width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;background:linear-gradient(to top, rgba(0,0,0,.72) 8%, rgba(0,0,0,.14) 52%, rgba(0,0,0,.02) 100%);}
     .rc-sub{font-family:'Space Mono',monospace;font-size:6.5px;letter-spacing:2px;text-transform:uppercase;opacity:.4;margin-bottom:4px;}
     .rc-t{font-size:14px;font-weight:300;letter-spacing:.04em;line-height:1.1;}
     .rc-info{margin-top:8px;}
@@ -187,12 +206,12 @@
   <div class="logo">FlickFic</div>
   <div class="nav-items">
     <div class="ni on">Featured</div>
-    <div class="ni" onclick="location.href='flickfic_browse.html'">Browse</div>
-    <div class="ni" onclick="location.href='flickfic_square.html'">Square</div>
+    <div class="ni" onclick="location.href='/flickfic_browse.html'">Browse</div>
+    <div class="ni" onclick="location.href='/flickfic_square.html'">Square</div>
   </div>
   <div class="nav-r">
-    <div class="srch" title="Search" onclick="location.href='flickfic_search.html'">&#9906;</div>
-    <div class="ava" onclick="location.href='flickfic_user.html'">R</div>
+    <div class="srch" title="Search" onclick="location.href='/flickfic_search.html'">&#9906;</div>
+    <div class="ava" onclick="location.href='/flickfic_user.html'">R</div>
   </div>
 </nav>
 
@@ -204,7 +223,7 @@
 <div class="row-section">
   <div class="row-head">
     <span class="row-label">New &amp; Upcoming</span>
-    <span class="row-all" onclick="location.href='flickfic_browse.html'">See all →</span>
+    <span class="row-all" onclick="location.href='/flickfic_browse.html'">See all →</span>
   </div>
   <div class="row-scroll" id="rowScroll"></div>
 </div>
@@ -236,6 +255,28 @@
     return {cls:'far p-3'};
   }
 
+  function makePosterData(title, textColor, bg){
+    const svg =
+      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 900'>" +
+      "<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>" +
+      "<stop offset='0' stop-color='" + bg[0] + "'/>" +
+      "<stop offset='1' stop-color='" + bg[1] + "'/>" +
+      "</linearGradient></defs>" +
+      "<rect width='600' height='900' fill='url(#g)'/>" +
+      "<rect x='22' y='22' width='556' height='856' fill='none' stroke='rgba(255,255,255,.18)' stroke-width='2'/>" +
+      "<text x='56' y='760' fill='rgba(255,255,255,.48)' font-size='20' letter-spacing='8' font-family='monospace'>FLICKFIC</text>" +
+      "<text x='56' y='820' fill='" + textColor + "' font-size='54' letter-spacing='2' font-family='Georgia'>" + title + "</text>" +
+      "</svg>";
+    return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+  }
+
+  WORKS.forEach((w)=>{
+    if(!w.poster){
+      const m = w.bg.match(/#(?:[0-9a-fA-F]{3}){1,2}/g) || ['#111111','#222222'];
+      w.poster = makePosterData(w.title, w.tc, [m[0], m[m.length - 1]]);
+    }
+  });
+
   function render(){
     const track = document.getElementById('track');
     track.innerHTML = '';
@@ -252,14 +293,18 @@
 
       const poster = document.createElement('div');
       poster.className = 'poster';
+      const img = document.createElement('img');
+      img.className = 'poster-img';
+      img.src = w.poster;
+      img.alt = w.title + ' poster';
 
       const art = document.createElement('div');
       art.className = 'poster-art';
-      art.style.background = w.bg;
       art.innerHTML =
         '<div class="p-label">FlickFic</div>' +
         '<div class="p-title" style="color:'+w.tc+'">'+w.title+'</div>';
 
+      poster.appendChild(img);
       poster.appendChild(art);
       item.appendChild(poster);
 
@@ -268,7 +313,7 @@
         meta.className = 'ctr-meta';
         meta.innerHTML =
           '<div class="cm-eye">'+w.eye+'</div>' +
-          '<div class="cm-title">'+w.title+'</div>' +
+          '<div class="cm-title link" onclick="enter('+w.id+')">'+w.title+'</div>' +
           '<div class="cm-desc">'+(w.desc || w.ep)+'</div>' +
           '<div class="cm-actions">' +
             '<button class="btn-enter" onclick="enter('+w.id+')">Enter</button>' +
@@ -298,11 +343,11 @@
 
   function enter(id){
     if(id === 0){
-      location.href = 'flickfic_newworld_detail.html';
+      location.href = '/flickfic_newworld_detail.html';
       return;
     }
     // demo：其他作品暂先也进入 New World 详情（程序员后续可按 workId 路由扩展）
-    location.href = 'flickfic_newworld_detail.html';
+    location.href = '/flickfic_newworld_detail.html';
   }
 
   function toggleCollect(btn){
@@ -344,11 +389,14 @@
 
   const rs = document.getElementById('rowScroll');
   ROW.forEach((r)=>{
+    const m = r.bg.match(/#(?:[0-9a-fA-F]{3}){1,2}/g) || ['#111111','#222222'];
+    const poster = makePosterData(r.title, r.tc, [m[0], m[m.length - 1]]);
     const c = document.createElement('div');
     c.className = 'rc';
     c.innerHTML =
       '<div class="rc-poster">' +
-        '<div class="rc-art" style="background:'+r.bg+'">' +
+        '<img class="rc-img" src="'+poster+'" alt="'+r.title+' poster" />' +
+        '<div class="rc-art">' +
           '<div class="rc-sub">FlickFic</div>' +
           '<div class="rc-t" style="color:'+r.tc+'">'+r.title+'</div>' +
         '</div>' +
