@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FlickFic — New World</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#080809;
+      --surface:#0e0e11;
+      --card:#131317;
+      --border:rgba(255,255,255,0.07);
+      --text:#ece9e2;
+      --muted:rgba(255,255,255,0.38);
+      --dim:rgba(255,255,255,0.14);
+      --accent:#c8a96e;
+      --accent2:#7c6fd4;
+    }
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Cormorant Garamond','Georgia',serif;
+      min-height:100vh;
+    }
+    #grain{
+      position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.035;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:200px;animation:g .5s steps(3) infinite;
+    }
+    @keyframes g{0%{background-position:0 0}33%{background-position:60px 40px}66%{background-position:-40px 80px}}
+
+    nav{
+      display:flex;align-items:center;gap:48px;padding:20px 52px;
+      position:sticky;top:0;z-index:100;background:rgba(8,8,9,0.92);
+      backdrop-filter: blur(3px);
+    }
+    .logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;letter-spacing:8px;color:var(--accent);text-transform:uppercase;}
+    .nav-back{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);cursor:pointer;transition:color .2s;}
+    .nav-back:hover{color:#fff;}
+    .nav-back::before{content:'←';font-size:12px;}
+    .nav-r{display:flex;align-items:center;gap:22px;margin-left:auto;}
+    .ava{width:28px;height:28px;border-radius:50%;background:rgba(200,169,110,0.18);border:1px solid rgba(200,169,110,0.35);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--accent);cursor:pointer;}
+
+    .banner{position:relative;height:420px;overflow:hidden;}
+    .banner-art{position:absolute;inset:0;background:linear-gradient(155deg,#1c0e08 0%,#080c1c 50%,#0d0810 100%);}
+    .banner-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 3px);pointer-events:none;}
+    .banner-fade{position:absolute;bottom:0;left:0;right:0;height:260px;background:linear-gradient(to bottom,transparent,var(--bg));}
+    .banner-fade-l{position:absolute;top:0;left:0;bottom:0;width:400px;background:linear-gradient(to right,var(--bg) 20%,transparent);}
+    .banner-deco{position:absolute;right:80px;bottom:80px;z-index:2;text-align:right;}
+    .deco-num{font-family:'Cormorant Garamond',serif;font-size:120px;font-weight:300;color:rgba(200,169,110,0.06);line-height:1;letter-spacing:.02em;}
+    .banner-content{position:absolute;bottom:52px;left:52px;z-index:2;}
+    .banner-eyebrow{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+    .banner-title{font-size:72px;font-weight:300;letter-spacing:.04em;line-height:.95;color:var(--text);margin-bottom:6px;}
+    .banner-sub{font-size:15px;font-style:italic;color:var(--muted);letter-spacing:.04em;margin-bottom:20px;}
+    .banner-tags{display:flex;gap:10px;align-items:center;}
+    .b-tag{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);border:0.5px solid rgba(255,255,255,0.1);padding:3px 9px;}
+
+    .actions-bar{
+      padding:0 52px 40px;
+      display:flex;align-items:center;gap:12px;
+      margin-top:-10px;position:relative;z-index:2;
+    }
+    .btn-primary{
+      font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+      padding:11px 26px;background:var(--accent);color:#080809;border:none;cursor:pointer;
+      transition:opacity .2s;border-radius:1px;white-space:nowrap;
+    }
+    .btn-primary:hover{opacity:.82;}
+    .btn-outline{
+      font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;
+      padding:11px 18px;background:transparent;color:var(--muted);
+      border:0.5px solid rgba(255,255,255,0.18);cursor:pointer;transition:all .2s;border-radius:1px;white-space:nowrap;
+    }
+    .btn-outline:hover{color:#fff;border-color:rgba(255,255,255,0.38);}
+    .btn-icon{width:38px;height:38px;border-radius:50%;background:transparent;border:0.5px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:13px;color:var(--muted);}
+    .btn-icon:hover{border-color:rgba(255,255,255,0.35);color:#fff;}
+
+    .body-grid{
+      display:grid;
+      grid-template-columns:1fr 320px;
+      gap:0;
+      padding:0 52px;
+      align-items:start;
+    }
+    .left-col{padding-right:52px;border-right:0.5px solid var(--border);}
+
+    .sec-label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:14px;}
+    .synopsis{margin-bottom:44px;}
+    .syn-text{font-size:15px;color:var(--muted);line-height:2;letter-spacing:.02em;max-width:56ch;}
+
+    .creator-list{display:flex;flex-direction:column;gap:0;}
+    .creator-item{display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 0;border-bottom:0.5px solid var(--border);transition:opacity .2s;}
+    .creator-item:first-child{border-top:0.5px solid var(--border);}
+    .creator-item:hover{opacity:.75;}
+    .cr-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;border:0.5px solid var(--border);}
+    .cr-av.av0{background:rgba(200,169,110,0.12);color:var(--accent);}
+    .cr-av.av1{background:rgba(124,111,212,0.12);color:var(--accent2);}
+    .cr-av.av2{background:rgba(100,160,140,0.12);color:#64a08c;}
+    .cr-name{font-size:14px;font-weight:400;color:var(--text);letter-spacing:.02em;margin-bottom:2px;}
+    .cr-role{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);}
+    .cr-id{font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,0.18);letter-spacing:1px;}
+    .cr-arrow{font-size:14px;color:var(--dim);}
+
+    .highlights{margin-bottom:44px;}
+    .hl-list{display:flex;flex-direction:column;gap:0;}
+    .hl-item{padding:14px 0;border-bottom:0.5px solid var(--border);display:flex;align-items:flex-start;gap:14px;}
+    .hl-item:first-child{border-top:0.5px solid var(--border);}
+    .hl-bar{width:2px;flex-shrink:0;align-self:stretch;border-radius:1px;margin-top:2px;}
+    .hl-bar.pub{background:rgba(200,169,110,0.5);}
+    .hl-bar.priv{background:rgba(124,111,212,0.4);}
+    .hl-quote{font-size:14px;color:var(--text);line-height:1.75;letter-spacing:.02em;margin-bottom:5px;font-style:italic;}
+    .hl-meta{display:flex;align-items:center;gap:10px;}
+    .hl-count{font-family:'Space Mono',monospace;font-size:8px;color:var(--accent);letter-spacing:1px;}
+    .hl-ep{font-family:'Space Mono',monospace;font-size:8px;color:var(--dim);letter-spacing:1px;}
+
+    .episodes{margin-bottom:0;}
+    .ep-list{display:flex;flex-direction:column;gap:0;}
+    .ep-item{
+      display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:16px;
+      padding:18px 0;border-bottom:0.5px solid var(--border);cursor:pointer;border-radius:1px;
+    }
+    .ep-item:first-child{border-top:0.5px solid var(--border);}
+    .ep-item:hover .ep-title{color:#fff;}
+    .ep-num-col{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px;text-align:right;}
+    .ep-label-row{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim);margin-bottom:5px;}
+    .ep-title{font-size:18px;font-weight:300;color:var(--text);letter-spacing:.03em;transition:color .2s;margin-bottom:4px;}
+    .ep-desc{font-size:12px;color:var(--muted);line-height:1.7;max-width:40ch;}
+    .ep-action{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+    .ep-play{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border:0.5px solid rgba(200,169,110,0.3);color:var(--accent);cursor:pointer;background:transparent;transition:all .2s;white-space:nowrap;}
+    .ep-play:hover{background:rgba(200,169,110,0.1);}
+    .ep-states{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:1px;color:var(--dim);}
+
+    .right-col{padding-left:36px;}
+    .comments-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+    .comments-title{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);}
+    .sort-wrap{position:relative;}
+    .sort-btn{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:1px;color:var(--accent);cursor:pointer;background:transparent;border:0.5px solid rgba(200,169,110,0.25);padding:3px 8px;border-radius:1px;}
+    .sort-menu{display:none;background:var(--card);border:0.5px solid var(--border);position:absolute;right:0;top:100%;z-index:50;min-width:160px;}
+    .sort-menu.open{display:block;}
+    .sort-opt{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 14px;color:var(--muted);cursor:pointer;transition:all .15s;border-bottom:0.5px solid var(--border);}
+    .sort-opt:last-child{border-bottom:none;}
+    .sort-opt:hover,.sort-opt.sel{color:#fff;background:rgba(255,255,255,0.04);}
+
+    .ep-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+    .ef{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:1px;text-transform:uppercase;padding:4px 9px;border:0.5px solid var(--border);color:var(--dim);cursor:pointer;transition:all .15s;border-radius:1px;}
+    .ef.on{border-color:rgba(200,169,110,0.4);color:var(--accent);background:rgba(200,169,110,0.07);}
+
+    .cmt-list{display:flex;flex-direction:column;gap:0;}
+    .cmt{padding:14px 0;border-bottom:0.5px solid var(--border);}
+    .cmt-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+    .cmt-user{display:flex;align-items:center;gap:8px;}
+    .cmt-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:7px;background:rgba(124,111,212,0.15);color:var(--accent2);border:0.5px solid rgba(124,111,212,0.25);}
+    .cmt-ep-tag{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1px;padding:2px 6px;background:rgba(200,169,110,0.08);color:var(--accent);border:0.5px solid rgba(200,169,110,0.2);border-radius:1px;}
+    .cmt-name{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:1px;}
+    .cmt-body{font-size:12.5px;color:rgba(255,255,255,0.55);line-height:1.75;letter-spacing:.01em;margin-bottom:8px;}
+    .cmt-actions{display:flex;align-items:center;gap:14px;}
+    .cmt-act{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:1px;color:var(--dim);cursor:pointer;transition:color .15s;display:flex;align-items:center;gap:4px;}
+    .cmt-act:hover{color:var(--muted);}
+    .cmt-act.liked{color:var(--accent);}
+    .cmt-time{font-family:'Space Mono',monospace;font-size:7px;color:rgba(255,255,255,0.12);margin-left:auto;}
+    .reply-thread{margin-top:10px;padding-left:14px;border-left:1px solid var(--border);}
+    .reply-item{padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);}
+    .reply-item:last-child{border-bottom:none;}
+    .reply-user{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--dim);margin-bottom:4px;}
+    .reply-body{font-size:12px;color:rgba(255,255,255,0.4);line-height:1.7;}
+
+    .compose-box{margin-top:14px;padding-top:14px;border-top:0.5px solid var(--border);}
+    .compose-ta{width:100%;background:var(--card);border:0.5px solid var(--border);color:var(--text);font-family:'Cormorant Garamond',serif;font-size:13px;line-height:1.7;padding:10px 12px;resize:none;min-height:66px;outline:none;transition:border-color .2s;border-radius:2px;}
+    .compose-ta:focus{border-color:rgba(200,169,110,0.35);}
+    .compose-ta::placeholder{color:rgba(255,255,255,0.18);}
+    .compose-bar{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:10px;}
+    .compose-ep-sel{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:1px;color:var(--dim);padding:8px 10px;border:0.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;border-radius:1px;}
+    .compose-send{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;background:var(--accent);color:#080809;border:none;cursor:pointer;transition:opacity .2s;border-radius:1px;white-space:nowrap;}
+    .compose-send:hover{opacity:.82;}
+
+    @media (max-width: 980px){
+      .body-grid{grid-template-columns:1fr;}
+      .left-col{padding-right:0;border-right:none;}
+      .right-col{padding-left:0;margin-top:18px;}
+      .banner-title{font-size:52px;}
+      .banner-content{left:18px;bottom:40px;}
+      .actions-bar{padding:0 18px 24px;}
+      .body-grid{padding:0 18px;}
+      nav{padding:18px 18px;}
+    }
+  </style>
+</head>
+<body>
+<div id="grain"></div>
+
+<nav>
+  <div class="logo">FlickFic</div>
+  <div class="nav-back" onclick="window.location.href='flickfic_home_v2.html'">Home</div>
+  <div class="nav-r">
+    <div class="ava">R</div>
+  </div>
+</nav>
+
+<div class="banner">
+  <div class="banner-art"></div>
+  <div class="banner-scan"></div>
+  <div class="banner-fade"></div>
+  <div class="banner-fade-l"></div>
+  <div class="banner-deco"><div class="deco-num">新世界</div></div>
+  <div class="banner-content">
+    <div class="banner-eyebrow">DCN Series · 2025</div>
+    <div class="banner-title">New World</div>
+    <div class="banner-sub">新世界</div>
+    <div class="banner-tags">
+      <div class="b-tag">4 Episodes</div>
+      <div class="b-tag">DCN v2.1</div>
+      <div class="b-tag">Text · Video · Image</div>
+    </div>
+  </div>
+</div>
+
+<div class="actions-bar">
+  <button class="btn-primary" onclick="window.location.href='the-fall-en.html'">▶ &nbsp;Play Episode 1</button>
+  <button class="btn-outline" id="collectBtn" onclick="collect()">+ Collect</button>
+  <div class="btn-icon" title="Share" onclick="alert('demo: share later')">↗</div>
+</div>
+
+<div class="body-grid">
+  <div class="left-col">
+    <div class="synopsis">
+      <div class="sec-label">Synopsis</div>
+      <div class="syn-text">
+        A city that rewrites itself every generation. The towers are new but the foundations are old, and the old foundations remember things the towers would rather forget.
+        Three people carry pieces of the same truth — a journalist who stopped publishing, an archivist who stopped filing, and a child who has not yet learned to stop asking.
+        One question connects them all. No one has dared to ask it aloud. Until now.
+      </div>
+    </div>
+
+    <div class="creators">
+      <div class="sec-label">Creators</div>
+      <div class="creator-list">
+        <div class="creator-item">
+          <div class="cr-av av0">EL</div>
+          <div class="cr-info">
+            <div class="cr-name">Elena Lau</div>
+            <div class="cr-role">Story Ideation</div>
+          </div>
+          <div class="cr-id">@elenalau</div>
+          <div class="cr-arrow">›</div>
+        </div>
+        <div class="creator-item">
+          <div class="cr-av av1">MV</div>
+          <div class="cr-info">
+            <div class="cr-name">Marcus Venn</div>
+            <div class="cr-role">Attention Choreography</div>
+          </div>
+          <div class="cr-id">@mvenn</div>
+          <div class="cr-arrow">›</div>
+        </div>
+        <div class="creator-item">
+          <div class="cr-av av2">SA</div>
+          <div class="cr-info">
+            <div class="cr-name">Sophia Ara</div>
+            <div class="cr-role">Media Generation</div>
+          </div>
+          <div class="cr-id">@sophiara</div>
+          <div class="cr-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlights">
+      <div class="sec-label">Reader Highlights</div>
+      <div class="hl-list">
+        <div class="hl-item">
+          <div class="hl-bar pub"></div>
+          <div class="hl-body">
+            <div class="hl-quote">"Power never disappears. It only changes hands."</div>
+            <div class="hl-meta"><span class="hl-count">419 readers</span><span class="hl-ep">Ep 01 · State 7</span></div>
+          </div>
+        </div>
+        <div class="hl-item">
+          <div class="hl-bar pub"></div>
+          <div class="hl-body">
+            <div class="hl-quote">"The moment she turned, I finally understood the whole story."</div>
+            <div class="hl-meta"><span class="hl-count">219 readers</span><span class="hl-ep">Ep 01 · State 18</span></div>
+          </div>
+        </div>
+        <div class="hl-item">
+          <div class="hl-bar priv"></div>
+          <div class="hl-body">
+            <div class="hl-quote">"This ending has no ending."</div>
+            <div class="hl-meta"><span class="hl-count">187 readers</span><span class="hl-ep">Ep 01 · State 23</span></div>
+          </div>
+        </div>
+        <div class="hl-item">
+          <div class="hl-bar pub"></div>
+          <div class="hl-body">
+            <div class="hl-quote">"The camera held still. The world did not."</div>
+            <div class="hl-meta"><span class="hl-count">156 readers</span><span class="hl-ep">Ep 01 · State 24</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="episodes">
+      <div class="sec-label" style="margin-bottom:0;">Episodes</div>
+      <div class="ep-list">
+        <div class="ep-item" onclick="window.location.href='the-fall-en.html'">
+          <div class="ep-num-col">01</div>
+          <div class="ep-body-col">
+            <div class="ep-label-row">Available Now</div>
+            <div class="ep-title">The Fall of the Powerful</div>
+            <div class="ep-desc">Thirty minutes. Forty-seven lives. A question no one could answer — who did this, and why did no one stop them sooner.</div>
+          </div>
+          <div class="ep-action">
+            <button class="ep-play" onclick="event.stopPropagation();window.location.href='the-fall-en.html'">Play</button>
+            <div class="ep-states">24 states</div>
+          </div>
+        </div>
+
+        <div class="ep-item" style="opacity:.4;cursor:default;">
+          <div class="ep-num-col">02</div>
+          <div class="ep-body-col">
+            <div class="ep-label-row">Coming Soon</div>
+            <div class="ep-title">The Ones Who Stayed</div>
+            <div class="ep-desc">After the storm, the city resumes. Some people don't.</div>
+          </div>
+          <div class="ep-action"><div class="ep-states">—</div></div>
+        </div>
+
+        <div class="ep-item" style="opacity:.4;cursor:default;">
+          <div class="ep-num-col">03</div>
+          <div class="ep-body-col">
+            <div class="ep-label-row">In Production</div>
+            <div class="ep-title">Untitled</div>
+            <div class="ep-desc">—</div>
+          </div>
+          <div class="ep-action"><div class="ep-states">—</div></div>
+        </div>
+
+        <div class="ep-item" style="opacity:.4;cursor:default;">
+          <div class="ep-num-col">04</div>
+          <div class="ep-body-col">
+            <div class="ep-label-row">In Development</div>
+            <div class="ep-title">Untitled</div>
+            <div class="ep-desc">—</div>
+          </div>
+          <div class="ep-action"><div class="ep-states">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div style="position:sticky;top:80px;">
+      <div class="comments-head">
+        <span class="comments-title">Comments</span>
+        <div class="sort-wrap">
+          <div class="sort-btn" onclick="toggleSort()">Sort ↕</div>
+          <div class="sort-menu" id="sortMenu">
+            <div class="sort-opt sel" onclick="setSort(this)">Most Popular</div>
+            <div class="sort-opt" onclick="setSort(this)">Latest</div>
+            <div class="sort-opt" onclick="setSort(this)">Ep 01 Only</div>
+            <div class="sort-opt" onclick="setSort(this)">Ep 02 Only</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ep-filter">
+        <div class="ef on" onclick="filterEp('all',this)">All</div>
+        <div class="ef" onclick="filterEp('ep1',this)">Ep 01</div>
+        <div class="ef" onclick="filterEp('ep2',this)">Ep 02</div>
+        <div class="ef" onclick="filterEp('ep3',this)">Ep 03</div>
+        <div class="ef" onclick="filterEp('ep4',this)">Ep 04</div>
+      </div>
+
+      <div class="cmt-list" id="cmtList">
+        <div class="cmt" data-ep="ep1">
+          <div class="cmt-head">
+            <div class="cmt-user">
+              <div class="cmt-av pub">L</div>
+              <span class="cmt-name">luna_r</span>
+              <span class="cmt-ep-tag">Ep 01</span>
+            </div>
+            <span class="cmt-time">2h ago</span>
+          </div>
+          <div class="cmt-body">State 7 stopped me completely. "Power never disappears — it only changes hands." I had to put it down and come back.</div>
+          <div class="cmt-actions">
+            <span class="cmt-act" onclick="likeC(this)">♡ <span class="ln">47</span></span>
+            <span class="cmt-act" onclick="toggleReply(this)">Reply</span>
+            <span class="cmt-act">↗ Share</span>
+          </div>
+          <div class="reply-thread" style="display:none;">
+            <div class="reply-item">
+              <div class="reply-user">mk_writes · 1h ago</div>
+              <div class="reply-body">Agreed — and it hits differently on re-read when you know what comes after.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cmt" data-ep="ep1">
+          <div class="cmt-head">
+            <div class="cmt-user">
+              <div class="cmt-av pub" style="background:rgba(200,169,110,0.15);color:var(--accent);border-color:rgba(200,169,110,0.3);">M</div>
+              <span class="cmt-name">mk_writes</span>
+              <span class="cmt-ep-tag">Ep 01</span>
+            </div>
+            <span class="cmt-time">5h ago</span>
+          </div>
+          <div class="cmt-body">The noon light in State 7 — "nothing had happened at all." That's the whole series in one image. The violence isn't in the event, it's in the calm that follows.</div>
+          <div class="cmt-actions">
+            <span class="cmt-act" onclick="likeC(this)">♡ <span class="ln">83</span></span>
+            <span class="cmt-act" onclick="toggleReply(this)">Reply</span>
+            <span class="cmt-act">↗ Share</span>
+          </div>
+        </div>
+
+        <div class="cmt" data-ep="ep1">
+          <div class="cmt-head">
+            <div class="cmt-user">
+              <div class="cmt-av" style="background:rgba(100,160,140,0.12);color:#64a08c;border-color:rgba(100,160,140,0.25);">X</div>
+              <span class="cmt-name">xian_b</span>
+              <span class="cmt-ep-tag">Ep 01</span>
+            </div>
+            <span class="cmt-time">1d ago</span>
+          </div>
+          <div class="cmt-body">Seventeen steps from the door to the chair. Does the number mean something or is it just a detail? Still thinking about it.</div>
+          <div class="cmt-actions">
+            <span class="cmt-act" onclick="likeC(this)">♡ <span class="ln">12</span></span>
+            <span class="cmt-act" onclick="toggleReply(this)">Reply</span>
+            <span class="cmt-act">↗ Share</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="compose-box">
+        <textarea class="compose-ta" id="newCmt" placeholder="Leave a comment…"></textarea>
+        <div class="compose-bar">
+          <select class="compose-ep-sel" id="cmtEpSel">
+            <option>Ep 01</option>
+            <option>Ep 02</option>
+            <option>Ep 03</option>
+            <option>Ep 04</option>
+          </select>
+          <button class="compose-send" onclick="postCmt()">Post</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div style="height:60px;"></div>
+
+<script>
+  function collect(){
+    const btn=document.getElementById('collectBtn');
+    btn.textContent=btn.textContent.includes('+')?'✓ Collected':'+ Collect';
+  }
+
+  function toggleSort(){
+    document.getElementById('sortMenu').classList.toggle('open');
+  }
+
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.sort-wrap')) document.getElementById('sortMenu').classList.remove('open');
+  });
+
+  function setSort(el){
+    document.querySelectorAll('.sort-opt').forEach(o=>o.classList.remove('sel'));
+    el.classList.add('sel');
+    document.getElementById('sortMenu').classList.remove('open');
+  }
+
+  function filterEp(ep,el){
+    document.querySelectorAll('.ef').forEach(e=>e.classList.remove('on'));
+    el.classList.add('on');
+    document.querySelectorAll('.cmt').forEach(c=>{
+      c.style.display = (ep==='all' || c.dataset.ep===ep) ? 'block' : 'none';
+    });
+  }
+
+  function likeC(el){
+    const n=el.querySelector('.ln');
+    n.textContent=parseInt(n.textContent)+1;
+    el.classList.add('liked');
+  }
+
+  function toggleReply(btn){
+    const cmt=btn.closest('.cmt');
+    const thread=cmt.querySelector('.reply-thread');
+    if(!thread) return;
+    thread.style.display = (thread.style.display==='none' || !thread.style.display) ? 'block' : 'none';
+  }
+
+  function postCmt(){
+    const ta=document.getElementById('newCmt');
+    const txt=ta.value.trim();
+    if(!txt) return;
+    const ep=document.getElementById('cmtEpSel').value;
+    const epKey = ep.toLowerCase().replace('ep ','ep'); // "Ep 01" -> ep01 (not used). We'll map manually below.
+    const epData = ep==='Ep 01' ? 'ep1' : ep==='Ep 02' ? 'ep2' : ep==='Ep 03' ? 'ep3' : 'ep4';
+
+    const c=document.createElement('div');
+    c.className='cmt';
+    c.dataset.ep=epData;
+    c.innerHTML=
+      '<div class="cmt-head">'+
+        '<div class="cmt-user">'+
+          '<div class="cmt-av pub" style="background:rgba(200,169,110,0.18);color:var(--accent);border-color:rgba(200,169,110,0.35);">R</div>'+
+          '<span class="cmt-name">You</span>'+
+          '<span class="cmt-ep-tag">'+ep+'</span>'+
+        '</div>'+
+        '<span class="cmt-time">Just now</span>'+
+      '</div>'+
+      '<div class="cmt-body">'+txt.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'+
+      '<div class="cmt-actions">'+
+        '<span class="cmt-act" onclick="likeC(this)">♡ <span class="ln">0</span></span>'+
+        '<span class="cmt-act" onclick="toggleReply(this)">Reply</span>'+
+        '<span class="cmt-act">↗ Share</span>'+
+      '</div>';
+
+    const list=document.getElementById('cmtList');
+    list.insertBefore(c,list.firstChild);
+    ta.value='';
+  }
+</script>
+</body>
+</html>
