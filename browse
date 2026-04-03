@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>FlickFic — Browse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    :root{--bg:#080809;--accent:#c8a96e;--muted:rgba(255,255,255,0.38);--text:#ece9e2;}
+    body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',Georgia,serif;min-height:100vh;overflow-x:hidden;}
+    #grain{position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.035;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:200px;animation:g .5s steps(3) infinite;}
+    @keyframes g{0%{background-position:0 0}33%{background-position:60px 40px}66%{background-position:-40px 80px}}
+    nav{display:flex;align-items:center;gap:48px;padding:22px 52px;position:relative;z-index:50;}
+    .logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;letter-spacing:8px;color:var(--accent);text-transform:uppercase;}
+    .back{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;}
+    .back:hover{color:#fff;}
+    .wrap{padding:40px 52px;max-width:980px;}
+    .title{font-size:44px;font-weight:300;letter-spacing:.04em;margin-bottom:14px;}
+    .hint{font-size:14px;color:var(--muted);line-height:1.9;letter-spacing:.02em;max-width:72ch;}
+    .panel{margin-top:26px;padding:18px 18px;border:0.5px solid rgba(255,255,255,0.08);border-radius:2px;background:rgba(255,255,255,0.02);}
+    .panel .small{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.22);margin-bottom:10px;}
+    .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+    .chip{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:1px;text-transform:uppercase;padding:6px 10px;border:0.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.25);}
+    .chip.on{border-color:rgba(200,169,110,0.4);color:var(--accent);background:rgba(200,169,110,0.08);}
+    @media (max-width: 900px){
+      nav{padding:18px 18px;}
+      .wrap{padding:24px 18px;}
+      .title{font-size:32px;}
+    }
+  </style>
+</head>
+<body>
+<div id="grain"></div>
+<nav>
+  <div class="logo">FlickFic</div>
+  <div class="back" onclick="location.href='flickfic_home_v2.html'">← Home</div>
+</nav>
+<div class="wrap">
+  <div class="title">Browse</div>
+  <div class="hint">
+    Demo 占位：后续这里会实现分类筛选 + 关键字搜索，并把作品卡片以你首页的 `rc` 风格渲染出来。
+  </div>
+  <div class="panel">
+    <div class="small">Prototype actions</div>
+    <div class="chips">
+      <div class="chip on">New</div>
+      <div class="chip">Series</div>
+      <div class="chip">Standalone</div>
+      <div class="chip">Coming Soon</div>
+      <div class="chip">In Production</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
