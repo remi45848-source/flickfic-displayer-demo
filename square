@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>FlickFic — Square</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    :root{--bg:#080809;--accent:#c8a96e;--muted:rgba(255,255,255,0.38);--text:#ece9e2;}
+    body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',Georgia,serif;min-height:100vh;}
+    #grain{position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.035;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:200px;animation:g .5s steps(3) infinite;}
+    @keyframes g{0%{background-position:0 0}33%{background-position:60px 40px}66%{background-position:-40px 80px}}
+    nav{display:flex;align-items:center;gap:48px;padding:22px 52px;position:relative;z-index:50;}
+    .logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;letter-spacing:8px;color:var(--accent);text-transform:uppercase;}
+    .back{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;}
+    .back:hover{color:#fff;}
+    .wrap{padding:40px 52px;max-width:980px;}
+    .title{font-size:44px;font-weight:300;letter-spacing:.04em;margin-bottom:14px;}
+    .hint{font-size:14px;color:var(--muted);line-height:1.9;letter-spacing:.02em;max-width:72ch;}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:18px;}
+    .card{
+      border:0.5px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.02);
+      border-radius:2px;
+      padding:16px 16px;
+    }
+    .card .k{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.22);margin-bottom:10px;}
+    .card .t{font-size:18px;font-weight:300;letter-spacing:.03em;margin-bottom:8px;}
+    .card .p{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.8;}
+    .small-actions{display:flex;gap:12px;margin-top:12px;align-items:center;}
+    .btn{
+      font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;
+      padding:8px 12px;border:0.5px solid rgba(255,255,255,0.12);
+      background:transparent;color:rgba(255,255,255,0.3);cursor:pointer;border-radius:1px;
+    }
+    .btn.on{border-color:rgba(200,169,110,0.4);color:var(--accent);background:rgba(200,169,110,0.07);}
+    @media (max-width: 900px){
+      nav{padding:18px 18px;}
+      .wrap{padding:24px 18px;}
+      .title{font-size:32px;}
+    }
+  </style>
+</head>
+<body>
+<div id="grain"></div>
+<nav>
+  <div class="logo">FlickFic</div>
+  <div class="back" onclick="location.href='flickfic_home_v2.html'">← Home</div>
+</nav>
+<div class="wrap">
+  <div class="title">Square</div>
+  <div class="hint">
+    Demo 占位：这里会做二创/讨论信息流（Hashtag 聚合、点赞/收藏、生成海报帖子卡）。
+  </div>
+  <div class="grid">
+    <div class="card">
+      <div class="k">#NewWorld · Highlight Post</div>
+      <div class="t">“The question connects them all.”</div>
+      <div class="p">来自 Episode 01 · State 17 的高亮引文（示例卡片）。</div>
+      <div class="small-actions">
+        <button class="btn on" onclick="this.classList.toggle('on')">Like</button>
+        <button class="btn" onclick="alert('demo: click open details later')">Open</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="k">#DCN · Discussion</div>
+      <div class="t">“Power never disappears — only changes hands.”</div>
+      <div class="p">讨论贴示例（demo）</div>
+      <div class="small-actions">
+        <button class="btn" onclick="this.classList.toggle('on')">Like</button>
+        <button class="btn" onclick="alert('demo: hashtag details later')">Hashtag</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
